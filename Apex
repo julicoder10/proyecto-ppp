@@ -1,0 +1,13 @@
+Crear una clase/service llamada UnitService.
+
+Crear un metodo (por ahora) que haga una query.
+
+estatico public methodName (Id unitId, String){ 
+
+
+(el json debe tener esta estructura {
+	“<IdQuestion1>”: “<IdOpcion2>”,
+	“<IdQuestion2>”: “<IdOpcion1>”
+})
+
+debe de tener un return (en resumen, un true-false) pero, este resultado debe ser resuelto por otro method.
