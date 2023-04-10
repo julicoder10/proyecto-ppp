@@ -153,31 +153,6 @@
     <enableSharing>true</enableSharing>
     <enableStreamingApi>true</enableStreamingApi>
     <externalSharingModel>ControlledByParent</externalSharingModel>
-    <fields>
-        <fullName>Question__c</fullName>
-        <deleteConstraint>SetNull</deleteConstraint>
-        <externalId>false</externalId>
-        <label>Question</label>
-        <referenceTo>Question__c</referenceTo>
-        <relationshipLabel>UserQuestions</relationshipLabel>
-        <relationshipName>UserQuestions</relationshipName>
-        <required>false</required>
-        <trackTrending>false</trackTrending>
-        <type>Lookup</type>
-    </fields>
-    <fields>
-        <fullName>UserUnit__c</fullName>
-        <externalId>false</externalId>
-        <label>UserUnit</label>
-        <referenceTo>UserUnit__c</referenceTo>
-        <relationshipLabel>UserQuestions</relationshipLabel>
-        <relationshipName>UserQuestions</relationshipName>
-        <relationshipOrder>0</relationshipOrder>
-        <reparentableMasterDetail>false</reparentableMasterDetail>
-        <trackTrending>false</trackTrending>
-        <type>MasterDetail</type>
-        <writeRequiresMasterRead>false</writeRequiresMasterRead>
-    </fields>
     <gender>Feminine</gender>
     <label>UserQuestion</label>
     <nameField>
@@ -185,7 +160,7 @@
         <type>Text</type>
     </nameField>
     <pluralLabel>UserQuestions</pluralLabel>
-    <searchLayouts/>
+    <searchLayouts></searchLayouts>
     <sharingModel>ControlledByParent</sharingModel>
     <visibility>Public</visibility>
 </CustomObject>
