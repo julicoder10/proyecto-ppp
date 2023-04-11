@@ -45,5 +45,46 @@ public with sharing class UnitService {
         insert questions;
     }
 
+    public static TrailWrapper getTrailWrapper(Id trailId) {
+        TrailWrapper wrapper = new TrailWrapper();
+        wrapper.trail = [SELECT Name, Description__c FROM Trail__c WHERE Id = :trailId];
+    
+        List<Module__c> modules = [SELECT Id, Name, Description__c FROM Module__c WHERE TrailModule__r.Trail__c = :trailId];
+        wrapper.modules = modules;
+    
+        Set<Id> passedModuleIds = new Set<Id>();
+        Set<Id> passedUnitIds = new Set<Id>();
+    
+        for (Module__c module : modules) {
+            for (Unit__c unit : module.Units__r) {
+                UserUnit__c userUnit = [SELECT Id, State__c FROM UserUnit__c WHERE Unit__c = :unit.Id AND User__c = :UserInfo.getUserId() LIMIT 1];
+                if (userUnit != null && userUnit.State__c == 'Success') {
+                    passedModuleIds.add(module.Id);
+                    passedUnitIds.add(unit.Id);
+                }
+            }
+        }
+        wrapper.passedModuleIds = passedModuleIds;
+        wrapper.passedUnitIds = passedUnitIds;
+    
+        wrapper.progressTrail = Math.round((100.0 * passedUnitIds.size()) / wrapper.modules.size());
+    
+        return wrapper;
+    }
+    
+    public static UnitWrapper getUnitWrapper(Id unitId) {
+        UnitWrapper wrapper = new UnitWrapper();
+    
+        // Query for Unit__c record and populate wrapper.unit
+        wrapper.unit = [SELECT Id, Name, Description__c FROM Unit__c WHERE Id = :unitId];
+    
+        // Query for related Question__c records and their related Options__c records and populate wrapper.questions
+        wrapper.questions = [SELECT Id, Name, Content__c,
+            (SELECT Id, Content__c, Correct__c FROM Options__r)
+            FROM Question__c WHERE Unit__c = :unitId];
+    
+        return wrapper;
+    }
 }
+
 
