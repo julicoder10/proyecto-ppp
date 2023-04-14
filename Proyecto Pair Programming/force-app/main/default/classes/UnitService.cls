@@ -1,6 +1,7 @@
 public with sharing class UnitService {
 
-    public static void getUnitIds(Id unitId, String jsonAnswer) {
+    @AuraEnabled(cacheable = false)
+    public static Boolean getUnitIds(Id unitId, String jsonAnswer) {
 
         // parseamos el jsonAnswer a un map.
         Map<Id, Id> questionsMap = (Map<Id, Id>) JSON.deserializeStrict(jsonAnswer, Map<Id, Id>.class);
@@ -19,10 +20,10 @@ public with sharing class UnitService {
             module = [SELECT Id FROM UserModule__c WHERE Module__c = :unit.Module__c  AND User__c = :UserInfo.getUserId() AND Status__c = 'In Progress'];
             }catch (Exception e){
 
-           module = new UserModule__c(User__c = userInfo.getUserId(),
-           Module__c = unit.Module__c,
-           Status__c = 'In Progress');
-           insert module;
+            module = new UserModule__c(User__c = userInfo.getUserId(),
+            Module__c = unit.Module__c,
+            Status__c = 'In Progress');
+            insert module;
            } 
         //creo el UserUnit en estado draft
         UserUnit__c unitResp = new UserUnit__c(
@@ -42,49 +43,72 @@ public with sharing class UnitService {
             questions.add(questionKey);
         }
 
+        unitResp.State__c = 'Answered';
+
         insert questions;
+
+        update unitResp;
+
+        // ATENCION --- Quizás deba hacer otra query para traerme el unitResp actualizado a Success.
+
+        if(unitResp.State__c == 'Success'){
+            return true;
+        }else{
+            return false;
+        }
     }
 
+    @AuraEnabled(cacheable = false)
     public static TrailWrapper getTrailWrapper(Id trailId) {
         TrailWrapper wrapper = new TrailWrapper();
-        wrapper.trail = [SELECT Name, Description__c FROM Trail__c WHERE Id = :trailId];
-    
-        List<Module__c> modules = [SELECT Id, Name, Description__c FROM Module__c WHERE TrailModule__r.Trail__c = :trailId];
+        
+        wrapper.trail = [SELECT Name, Description__c
+                 FROM Trail__c 
+                 WHERE Id = :trailId];
+        
+        // Obtener los registros de TrailModule__c que están relacionados con el trailId dado
+        List<TrailModule__c> trailModules = [SELECT Module__c FROM TrailModule__c WHERE Trail__c = :trailId];
+
+        List<Id> moduleIds = new List<Id>();
+        for (TrailModule__c tm : trailModules) {
+            moduleIds.add(tm.Module__c);
+        }
+
+        // Obtener los módulos relacionados a través de la relación Module__c en los registros de TrailModule__c
+        //List<Module__c> modules = [SELECT Id, Name, Description__c FROM Module__c WHERE Id IN :moduleIds];
+        List<Module__c> modules = [SELECT Id, Name, Description__c, Points__c, TotalTime__c, (SELECT Id, Name, Time__c, Points__c FROM Units__r) FROM Module__c WHERE Id IN :moduleIds];
         wrapper.modules = modules;
-    
+
+        List<UserUnit__c> userUnits = [SELECT Id, State__c, Unit__c FROM UserUnit__c WHERE Unit__c IN (SELECT Id FROM Unit__c WHERE Module__c IN :modules) AND User__c = :UserInfo.getUserId() AND State__c = 'Success'];
+
         Set<Id> passedModuleIds = new Set<Id>();
         Set<Id> passedUnitIds = new Set<Id>();
-    
-        for (Module__c module : modules) {
-            for (Unit__c unit : module.Units__r) {
-                UserUnit__c userUnit = [SELECT Id, State__c FROM UserUnit__c WHERE Unit__c = :unit.Id AND User__c = :UserInfo.getUserId() LIMIT 1];
-                if (userUnit != null && userUnit.State__c == 'Success') {
-                    passedModuleIds.add(module.Id);
-                    passedUnitIds.add(unit.Id);
-                }
-            }
+
+        // Iterar por los registros de UserUnit__c para obtener los módulos y unidades aprobadas
+        for (UserUnit__c userUnit : userUnits) {
+            passedModuleIds.add(userUnit.Unit__r.Module__c); // Agregar el Id del módulo aprobado al conjunto de passedModuleIds
+            passedUnitIds.add(userUnit.Unit__c); // Agregar el Id de la unidad aprobada al conjunto de passedUnitIds
         }
+
         wrapper.passedModuleIds = passedModuleIds;
         wrapper.passedUnitIds = passedUnitIds;
     
         wrapper.progressTrail = Math.round((100.0 * passedUnitIds.size()) / wrapper.modules.size());
-    
+       
         return wrapper;
     }
-    
+
+    @AuraEnabled(cacheable = false)    
     public static UnitWrapper getUnitWrapper(Id unitId) {
         UnitWrapper wrapper = new UnitWrapper();
     
         // Query for Unit__c record and populate wrapper.unit
-        wrapper.unit = [SELECT Id, Name, Description__c FROM Unit__c WHERE Id = :unitId];
-    
+        wrapper.unit = [SELECT Id, Name, Time__c, Points__c, Content__c  FROM Unit__c WHERE Id = :unitId];
+
         // Query for related Question__c records and their related Options__c records and populate wrapper.questions
-        wrapper.questions = [SELECT Id, Name, Content__c,
-            (SELECT Id, Content__c, Correct__c FROM Options__r)
-            FROM Question__c WHERE Unit__c = :unitId];
+        wrapper.questions = [SELECT Id, Name, Content__c, (SELECT Id, Name, Content__c FROM Options__r) FROM Question__c WHERE Unit__c =: unitId];
     
         return wrapper;
     }
 }
-
 

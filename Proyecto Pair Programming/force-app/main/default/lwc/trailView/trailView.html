@@ -1,0 +1,40 @@
+<template>
+  <div class="slds-card">
+      <header class="slds-card__header slds-text-heading_small slds-theme_header">
+          <h2 class="slds-text-title_caps">{trailName}</h2>
+      </header>
+      <div class="slds-card__body slds-card__body_inner slds-theme_default">
+          <p class="slds-text-color_weak slds-truncate slds-unit-time">{totalTrailTime}min</p>
+          <p class="slds-text-body_regular slds-truncate">{trailDescription}</p>
+          <p class="slds-text-color_weak slds-truncate slds-unit-points">{totalTrailPoints} points</p>
+      </div>
+  </div>
+
+  <div class="slds-card slds-m-top_medium">
+      <header class="slds-card__header slds-text-heading_small slds-theme_header">
+          <h2 class="slds-text-title_caps">Modules</h2>
+      </header>
+      <lightning-accordion>
+        <template for:each={modules} for:item="module">
+            <lightning-accordion-section key={module.Id} label={module.Name}>
+              <h2>{module.Points__c}p</h2>
+              <h2>{module.TotalTime__c} Min</h2>
+                <div class="slds-m-around_medium">
+                    <div class="slds-grid slds-wrap">
+                        <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-2">
+                          <h2>{module.description__c}</h2>
+                            <template for:each={module.Units__r} for:item="unit">
+                                <div key={unit.Id} class="slds-m-top_small" >
+                                    <a class="slds-unit-name" onclick={handleUnitClick} data-unit-id={unit.Id}>{unit.Name}</a>
+                                    <p class="slds-unit-time">Total de tiempo estimado: {unit.Time__c}</p>
+                                    <p class="slds-unit-points">Total de puntos: {unit.Points__c}</p>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </lightning-accordion-section>
+        </template>
+    </lightning-accordion>
+  </div>
+</template>

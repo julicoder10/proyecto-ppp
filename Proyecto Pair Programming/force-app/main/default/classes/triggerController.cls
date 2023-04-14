@@ -31,11 +31,11 @@ public with sharing class triggerController {
             
             // Actualizar el estado de los UserUnit__c en base a los resultados almacenados en el Map
             List<UserUnit__c> userUnitsToUpdate = new List<UserUnit__c>();
+            
             for (UserUnit__c answeredUnit : answeredUnits) {
                 answeredUnit.State__c = unitResults.get(answeredUnit.Id);
                 userUnitsToUpdate.add(answeredUnit);
             }
-            update userUnitsToUpdate;
         }
     }
 }

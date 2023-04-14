@@ -1,4 +1,6 @@
 public with sharing class UnitWrapper{
+    @AuraEnabled
     public Unit__c unit; 
-    public List<Question__c> questions;    
+    @AuraEnabled
+    public List<Question__c> questions;
 }

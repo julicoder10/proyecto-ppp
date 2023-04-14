@@ -1,0 +1,40 @@
+<!--<template>
+  <lightning-card title={unitName} icon-name="standard:record">
+      <div class="slds-p-horizontal_small">
+          <p><b>Descripción:</b> {unitDescription}</p>
+          <p><b>Tiempo estimado:</b> {unitEstimatedTime}</p>
+          <p><b>Puntos totales:</b> {unitTotalPoints}</p>
+      </div>
+  </lightning-card>
+</template>-->
+
+<template>
+  <lightning-card title={unitName} icon-name="standard:record">
+    <div class="slds-p-horizontal_small">
+      <p><b>Description:</b> {unitDescription}</p>
+      <p><b>Estimated Time:</b> {unitEstimatedTime}min</p>
+      <p><b>Points:</b> {unitTotalPoints}p.</p>
+    </div>
+  </lightning-card>
+
+  <!-- Iteración de preguntas utilizando for:each -->
+  <template for:each={questions} for:item="question">
+    <lightning-card key={question.Id} title={question.Content__c}>
+      <div class="slds-p-horizontal_small">
+        <!-- Puedes acceder a los campos de las opciones relacionadas utilizando otro for:each -->
+        <template for:each={question.Options__r} for:item="option">
+          <p key={option.Id}><b>Opción:</b> {option.Content__c}</p>
+          <lightning-input 
+            key={option.Id}
+            type="radio"
+            name={question.Id} 
+            class="radioButton"
+            value={option.Question__c} 
+            value2={option.Id} 
+            onclick={handleRadioChange}>
+          </lightning-input>
+        </template>
+      </div>
+    </lightning-card>
+  </template>
+</template>

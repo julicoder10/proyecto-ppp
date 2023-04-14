@@ -1,0 +1,50 @@
+/* trailView.css */
+
+/* Estilo para el título del sendero */
+.slds-trail-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 16px;
+  }
+  
+  /* Estilo para el nombre de los módulos */
+  .slds-module-name {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+  
+  /* Estilo para la descripción de los módulos */
+  .slds-module-description {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 8px;
+  }
+  
+  /* Estilo para el tiempo estimado de las unidades */
+  .slds-unit-time {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 4px;
+  }
+  
+  /* Estilo para los puntos de las unidades */
+  .slds-unit-points {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 4px;
+  }
+
+.superbutton{
+    padding: .5rem 2rem;
+    border: 3rem;
+    background-color: transparent;
+    border: 2px solid rgb(15, 163, 243);
+    color: rgb(15, 163, 243);
+    transition: .4s ease-in-out;
+}
+
+.superbutton:hover {
+    background-color: rgb(15, 163, 243);
+    color:#fff;
+}
